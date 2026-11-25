@@ -1,0 +1,37 @@
+mod "Speedhack"
+author "GoCode"
+version "1.0.0"
+
+# F5 slower, F6 faster, F7 back to 1.0x.  For ANY speed, put  speed=1.5  into gocode\config\speedhack.cfg
+# (applies within a second). Using a speed other than 1.0x switches on Safe Mode: score and level uploads are
+# blocked until you restart the game, so a sped-up run can never verify a level or post a record.
+
+let step = cfg("speed_step", 0.1)
+let last_cfg = 1
+
+fn show() {
+    let s = speed()
+    if s == 1 { status("") } else { status(format("speed %.2fx", s)) }
+}
+
+fn change(s) {
+    s = round(s, 2)
+    if set_speed(s) {
+        log(format("speed is now %.2fx", speed()))
+    } else {
+        log(format("speed %.2fx was refused (see the safe-mode lines in gocode.log)", s))
+    }
+    show()
+}
+
+on key F5 { change(speed() - step) }
+on key F6 { change(speed() + step) }
+on key F7 { change(1) }
+
+on tick 1s {
+    let want = cfg("speed", 1)
+    if want != last_cfg {
+        last_cfg = want
+        change(want)
+    }
+}

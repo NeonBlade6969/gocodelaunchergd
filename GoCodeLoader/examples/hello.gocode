@@ -1,0 +1,20 @@
+mod "Hello GoCode"
+author "you"
+version "1.0.0"
+
+# Runs once when the game has started.
+on start {
+    log("Hello from GoCode!  GD base:", format("0x%X", gd_base()), " version stamp:", format("0x%X", gd_stamp()))
+}
+
+# Press ctrl+F10 in the game to run this.
+on key ctrl+F10 {
+    log("ctrl+F10 pressed, speed is", speed(), "fps target is", fps())
+}
+
+# Runs every 5 seconds.
+let ticks = 0
+on tick 5s {
+    ticks += 1
+    log("tick", ticks)
+}

@@ -1,0 +1,21 @@
+mod "Memory patch example"
+author "you"
+version "1.0.0"
+
+# Offsets and byte patterns are specific to ONE Geometry Dash version. Find yours with a disassembler (Ghidra, x64dbg),
+# then lock the mod to that exact game build. The loader logs your version stamp on startup (gocode.log).
+# require_stamp 0x12345678
+
+on start {
+    # Find a byte pattern (?? = any byte) inside GeometryDash.exe, then patch relative to the match.
+    let hit = scan("8B 45 ?? 85 C0")
+    if hit == 0 {
+        log("pattern not found - wrong game version?")
+        return
+    }
+    patch(hit + 2, [0x90, 0x90])             # overwrite two bytes
+    nop(hit + 8, 6)                           # overwrite six bytes with NOP
+    patch(hit + 20, f32_bytes(2.5))           # write a float
+    log("patched at", format("0x%X", hit), " first bytes now:", read_bytes(hit, 4))
+    taint("memory patch example")             # call this from any mod that gives an unfair advantage
+}

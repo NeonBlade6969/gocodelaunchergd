@@ -1,0 +1,51 @@
+mod "FPS Bypass"
+author "GoCode"
+version "1.0.0"
+
+# F8 steps through the presets below (then off), Shift+F8 turns the bypass off.
+# For ANY frame rate, put  fps=1234  into gocode\config\fps-bypass.cfg  (applies within a second, 0 = off).
+# If the frame rate does not rise, turn VSync off in Geometry Dash's video settings.
+
+let presets = [60, 120, 240, 360, 480, 1000]
+let last_cfg = 0
+
+fn apply(f) {
+    if !set_fps(f) {
+        log("could not set", f, "FPS - frame-rate control is unavailable (see the fps lines in gocode.log)")
+        return
+    }
+    if f == 0 {
+        status("")
+        log("FPS bypass off")
+    } else {
+        status(format("%d FPS", f))
+        log(format("FPS target %d", f))
+    }
+}
+
+on key F8 {
+    let cur = fps()
+    let next = 0
+    if cur == 0 {
+        next = presets[0]
+    } else {
+        let idx = -1
+        let i = 0
+        for p in presets {
+            if p == cur { idx = i }
+            i += 1
+        }
+        if idx + 1 < len(presets) { next = presets[idx + 1] }
+    }
+    apply(next)
+}
+
+on key shift+F8 { apply(0) }
+
+on tick 1s {
+    let want = cfg("fps", 0)
+    if want != last_cfg {
+        last_cfg = want
+        apply(want)
+    }
+}

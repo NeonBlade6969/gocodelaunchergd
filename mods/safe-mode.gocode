@@ -1,0 +1,21 @@
+mod "Safe Mode"
+author "GoCode"
+version "1.0.0"
+
+# Shows Safe Mode state in the window title. The protection itself is built into the loader and cannot be turned off
+# by a script: once a speed exploit is used, requests that upload scores or level data are blocked until the game
+# is restarted. If the loader could not install that protection, speed changes are refused altogether.
+
+on start {
+    if guard_active() {
+        log("armed: score and level uploads are blocked if a speed exploit is used")
+        status("safe mode armed")
+    } else {
+        log("the guard could not be installed - the speedhack is locked to 1.0x")
+        status("safe mode OFFLINE: speed locked")
+    }
+}
+
+on tick 1s {
+    if tainted() { status("") }   # the loader shows its own "uploads blocked" banner
+}
